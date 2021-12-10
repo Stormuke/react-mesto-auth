@@ -19,6 +19,9 @@
 @import url("./blocks/popup/__submit/_disabled/popup__submit_disabled.css");
 @import url("./blocks/popup/__text-error/popup__text-error.css");
 @import url("./blocks/popup/__text-error/_visible/popup__text-error_visible.css");
+@import url("./blocks/popup/__picture/popup__picture.css");
+@import url("./blocks/popup/__container/_size/popup__container_size_m.css");
+@import url("./blocks/popup/__title/_theme/popup__title_theme_auth.css");
 
 @import url("./blocks/header/header.css");
 @import url("./blocks/header/__logo/header__logo.css");

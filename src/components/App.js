@@ -1,17 +1,21 @@
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
-import React, {useEffect} from "react";
+import React from "react";
 import ImagePopup from "./ImagePopup";
 import api from "../utils/api";
 import {CurrentUserContext} from "../constexts/CurrentUserContext";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
-import {Routes, Route} from "react-router-dom";
+import {Routes, Route, Navigate, useNavigate} from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
-
+import * as auth from "../utils/auth"
+import ProtectedRoute from "./ProtectedRoute";
+import fail from "../images/fail.svg"
+import success from "../images/success.svg"
+import InfoTooltip from "./InfoTooltip";
 
 
 
@@ -22,8 +26,62 @@ function App() {
     const [selectedCard, setSelectedCard] = React.useState(null)
     const [currentUser, setCurrentUser] = React.useState({})
     const [cards, setCards] = React.useState([])
+    const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+    const [mailName, setMailName] = React.useState('')
+    const [popupImage, setPopupImage] = React.useState('')
+    const [popupTitle, setPopupTitle] = React.useState('')
+    const [infoTooltip, setInfoTooltip] = React.useState(false)
 
-    useEffect(() => {
+
+    const navigate = useNavigate()
+
+    React.useEffect(() => {
+        const jwt = localStorage.getItem("jwt")
+        if (jwt) {
+            auth.checkToken(jwt)
+                .then((res) => {
+                    if (res) {
+                        setIsLoggedIn(true)
+                        setMailName(res.data.email)
+                        navigate('/')
+                    }
+                })
+                .catch((err) => {
+                    console.log(`Не удалось получить токен: ${err}`)
+                })
+        }
+    }, [navigate])
+
+    function onRegister(email, password) {
+        auth.register(email, password)
+            .then(() => {
+                setPopupImage(success)
+                setPopupTitle("Вы успешно зарегистрировались!")
+                navigate('/sign-in')
+            })
+            .catch(() => {
+                setPopupImage(fail)
+                setPopupTitle('Что-то пошло не так! Попробуйте ещё раз.')
+            })
+            .finally(handleInfoTooltip)
+
+    }
+
+    function onLogin(email, password) {
+        auth.login(email, password)
+            .then((res) => {
+                localStorage.setItem('jwt', res.token)
+                setIsLoggedIn(true)
+                navigate('/')
+            })
+            .catch(() => {
+                setPopupImage(fail)
+                setPopupTitle('Не верные имя пользователя или пароль.')
+                handleInfoTooltip()
+            })
+    }
+
+    React.useEffect(() => {
         Promise.all([api.getUserInfo(), api.getInitialCards()])
             .then(([user, cards]) => {
                 setCurrentUser(user)
@@ -115,6 +173,9 @@ function App() {
         setIsAddPlacePopupOpen(true)
     }
 
+    function handleInfoTooltip() {
+        setInfoTooltip(true)
+    }
 
     function closeOverlayClick(evt) {
         if (evt.target.classList.contains('popup_opened')) {
@@ -123,7 +184,7 @@ function App() {
     }
 
     React.useEffect(() => {
-        if (isAddPlacePopupOpen || isEditProfilePopupOpen || isEditAvatarPopupOpen || selectedCard) {
+        if (isAddPlacePopupOpen || isEditProfilePopupOpen || isEditAvatarPopupOpen || selectedCard || infoTooltip) {
             function handleEscape(evt) {
                 if (evt.key === "Escape") {
                     closeAllPopups()
@@ -136,37 +197,46 @@ function App() {
                 document.removeEventListener('keydown', handleEscape)
             }
         }
-    }, [isAddPlacePopupOpen, isEditProfilePopupOpen, isEditAvatarPopupOpen, selectedCard])
+    }, [isAddPlacePopupOpen, isEditProfilePopupOpen, isEditAvatarPopupOpen, selectedCard, infoTooltip])
 
     function closeAllPopups() {
         setIsEditAvatarPopupOpen(false)
         setIsEditProfilePopupOpen(false)
         setIsAddPlacePopupOpen(false)
         setSelectedCard(null)
+        setInfoTooltip(false)
+    }
+
+    function onSignOut() {
+        setIsLoggedIn(false)
+        navigate('/sign-in')
+        localStorage.removeItem("jwt")
     }
 
   return (
       <CurrentUserContext.Provider value={currentUser}>
       <div className="container">
               <Routes>
-                  <Route path="/sing-in" element={
+                  <Route path="/sign-in" element={
                       <>
-                          <Header title="Регистрация" click="/sing-up"/>
-                          <Login />
+                          <Header title="Регистрация" route="/sign-up" />
+                          <Login onLogin={onLogin} />
                       </>
 
                   } />
-                  <Route path="/sing-up" element={
+                  <Route path="/sign-up" element={
                       <>
-                          <Header title="Войти" click="/sing-in"/>
-                          <Register />
+                          <Header title="Войти" route="/sign-in"/>
+                          <Register onRegister={onRegister} />
                       </>
 
                   }/>
                   <Route path="/" element={
                       <>
-                          <Header title="Выйти" mail="alex@ya.ru" click="/sing-in"/>
-                          <Main
+                          <Header title="Выйти" mail={mailName} onClick={onSignOut} route=''/>
+                          <ProtectedRoute
+                              component={Main}
+                              isLogged={isLoggedIn}
                               onEditAvatar={handleEditAvatarClick}
                               onEditProfile={handleEditProfileClick}
                               onAddPlace={handleAddPlaceClick}
@@ -178,6 +248,7 @@ function App() {
                           <Footer/>
                       </>
                   } />
+                  <Route element={<Navigate to={isLoggedIn ? "/" : "/sign-in"}/>} />
               </Routes>
 
 
@@ -202,6 +273,14 @@ function App() {
               onClose={closeAllPopups}
               onSubmit={handleAddPlaceSubmit}
               onOverlayClick={closeOverlayClick}/>
+
+          <InfoTooltip
+              isOpen={infoTooltip}
+              onClose={closeAllPopups}
+              onOverlayClick={closeOverlayClick}
+              image={popupImage}
+              title={popupTitle}
+              />
       </div>
       </CurrentUserContext.Provider>
   );

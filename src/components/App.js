@@ -28,7 +28,7 @@ function App() {
     const [currentUser, setCurrentUser] = useState({})
     const [cards, setCards] = useState([])
     const [isLoggedIn, setIsLoggedIn] = useState(false)
-    const [mailName, setMailName] = useState('')
+    const [mailName, setMailName] = useState(null)
     const [popupImage, setPopupImage] = useState('')
     const [popupTitle, setPopupTitle] = useState('')
     const [infoTooltip, setInfoTooltip] = useState(false)
@@ -217,7 +217,7 @@ function App() {
 
     function onSignOut() {
         setIsLoggedIn(false)
-        setMailName(null)
+        setMailName('')
         navigate('/sign-in')
         localStorage.removeItem("jwt")
     }

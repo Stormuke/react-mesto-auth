@@ -78,6 +78,7 @@ function App() {
             .then((res) => {
                 localStorage.setItem('jwt', res.token)
                 setIsLoggedIn(true)
+                setMailName(email)
                 navigate('/')
             })
             .catch(() => {
@@ -216,6 +217,7 @@ function App() {
 
     function onSignOut() {
         setIsLoggedIn(false)
+        setMailName(null)
         navigate('/sign-in')
         localStorage.removeItem("jwt")
     }

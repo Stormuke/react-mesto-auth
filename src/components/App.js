@@ -217,7 +217,7 @@ function App() {
 
     function onSignOut() {
         setIsLoggedIn(false)
-        setMailName('')
+        setMailName(null)
         navigate('/sign-in')
         localStorage.removeItem("jwt")
     }

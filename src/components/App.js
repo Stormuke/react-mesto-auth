@@ -1,7 +1,7 @@
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
-import React from "react";
+import {useEffect, useState} from "react";
 import ImagePopup from "./ImagePopup";
 import api from "../utils/api";
 import {CurrentUserContext} from "../constexts/CurrentUserContext";
@@ -20,22 +20,23 @@ import InfoTooltip from "./InfoTooltip";
 
 
 function App() {
-    const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false)
-    const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false)
-    const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false)
-    const [selectedCard, setSelectedCard] = React.useState(null)
-    const [currentUser, setCurrentUser] = React.useState({})
-    const [cards, setCards] = React.useState([])
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false)
-    const [mailName, setMailName] = React.useState('')
-    const [popupImage, setPopupImage] = React.useState('')
-    const [popupTitle, setPopupTitle] = React.useState('')
-    const [infoTooltip, setInfoTooltip] = React.useState(false)
+    const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false)
+    const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false)
+    const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false)
+    const [isImagePopupOpen, setIsImagePopupOpen] = useState(false)
+    const [selectedCard, setSelectedCard] = useState(null)
+    const [currentUser, setCurrentUser] = useState({})
+    const [cards, setCards] = useState([])
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [mailName, setMailName] = useState('')
+    const [popupImage, setPopupImage] = useState('')
+    const [popupTitle, setPopupTitle] = useState('')
+    const [infoTooltip, setInfoTooltip] = useState(false)
 
 
     const navigate = useNavigate()
 
-    React.useEffect(() => {
+    useEffect(() => {
         const jwt = localStorage.getItem("jwt")
         if (jwt) {
             auth.checkToken(jwt)
@@ -43,14 +44,19 @@ function App() {
                     if (res) {
                         setIsLoggedIn(true)
                         setMailName(res.data.email)
-                        navigate('/')
                     }
                 })
                 .catch((err) => {
                     console.log(`Не удалось получить токен: ${err}`)
                 })
         }
-    }, [navigate])
+    }, [])
+
+    useEffect(() => {
+        if (isLoggedIn === true) {
+            navigate('/')
+        }
+    }, [isLoggedIn, navigate])
 
     function onRegister(email, password) {
         auth.register(email, password)
@@ -81,7 +87,7 @@ function App() {
             })
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         Promise.all([api.getUserInfo(), api.getInitialCards()])
             .then(([user, cards]) => {
                 setCurrentUser(user)
@@ -159,6 +165,7 @@ function App() {
 
     function handleCardClick(card) {
         setSelectedCard(card)
+        setIsImagePopupOpen(true)
     }
 
     function handleEditAvatarClick() {
@@ -183,7 +190,7 @@ function App() {
         }
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (isAddPlacePopupOpen || isEditProfilePopupOpen || isEditAvatarPopupOpen || selectedCard || infoTooltip) {
             function handleEscape(evt) {
                 if (evt.key === "Escape") {
@@ -203,7 +210,7 @@ function App() {
         setIsEditAvatarPopupOpen(false)
         setIsEditProfilePopupOpen(false)
         setIsAddPlacePopupOpen(false)
-        setSelectedCard(null)
+        setIsImagePopupOpen(false)
         setInfoTooltip(false)
     }
 
@@ -223,14 +230,16 @@ function App() {
                           <Login onLogin={onLogin} />
                       </>
 
-                  } />
+                  }
+                  />
                   <Route path="/sign-up" element={
                       <>
                           <Header title="Войти" route="/sign-in"/>
                           <Register onRegister={onRegister} />
                       </>
 
-                  }/>
+                  }
+                  />
                   <Route path="/" element={
                       <>
                           <Header title="Выйти" mail={mailName} onClick={onSignOut} route=''/>
@@ -247,40 +256,42 @@ function App() {
                           />
                           <Footer/>
                       </>
-                  } />
+                  }
+                  />
                   <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/sign-in"}/>} />
               </Routes>
 
-
           <ImagePopup
-          card={selectedCard}
-          onClose={closeAllPopups}
-          onOverlayClick={closeOverlayClick}
+              isOpen={isImagePopupOpen}
+              card={selectedCard}
+              onClose={closeAllPopups}
+              onOverlayClick={closeOverlayClick}
           />
-
           <EditProfilePopup
               isOpen={isEditProfilePopupOpen}
               onClose={closeAllPopups}
               onSubmit={handleUpdateUser}
-              onOverlayClick={closeOverlayClick}/>
+              onOverlayClick={closeOverlayClick}
+          />
           <EditAvatarPopup
               isOpen={isEditAvatarPopupOpen}
               onClose={closeAllPopups}
               onSubmit={handleAvatarUpdate}
-              onOverlayClick={closeOverlayClick}/>
+              onOverlayClick={closeOverlayClick}
+          />
           <AddPlacePopup
               isOpen={isAddPlacePopupOpen}
               onClose={closeAllPopups}
               onSubmit={handleAddPlaceSubmit}
-              onOverlayClick={closeOverlayClick}/>
-
+              onOverlayClick={closeOverlayClick}
+          />
           <InfoTooltip
               isOpen={infoTooltip}
               onClose={closeAllPopups}
               onOverlayClick={closeOverlayClick}
               image={popupImage}
               title={popupTitle}
-              />
+          />
       </div>
       </CurrentUserContext.Provider>
   );

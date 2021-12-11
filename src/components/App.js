@@ -248,7 +248,7 @@ function App() {
                           <Footer/>
                       </>
                   } />
-                  <Route element={<Navigate to={isLoggedIn ? "/" : "/sign-in"}/>} />
+                  <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/sign-in"}/>} />
               </Routes>
 
 

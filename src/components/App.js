@@ -240,7 +240,7 @@ function App() {
 
                   }
                   />
-                  <Route path="/" element={
+                  <Route exact path="/" element={
                       <>
                           <Header title="Выйти" mail={mailName} onClick={onSignOut} route=''/>
                           <ProtectedRoute

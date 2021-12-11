@@ -10,3 +10,9 @@
 .header__button:hover {
     opacity: 0.6;
 }
+
+@media screen and (max-width: 768px){
+    .header__button {
+        margin-right: 10px;
+    }
+}

@@ -14,3 +14,9 @@
     margin: 0;
 }
 
+@media screen and (max-width: 768px) {
+    .login__input {
+        width: 260px;
+    }
+}
+

@@ -1,6 +1,6 @@
 function PopupWithForm(props) {
     return (
-        <div className={`popup popup_form_${props.name} ${props.isOpen ? `popup_opened`: ""}`} onClick={props.onOverlayClick}>
+        <div className={`popup popup_form_${props.name} ${props.isOpen ? `popup_opened`: ""}`} onMouseDown={props.onOverlayClick}>
             <div className="popup__container">
                 <button type="button" className="popup__button-close" onClick={props.onClose}/>
                 <form name={props.form} className="popup__form" onSubmit={props.onSubmit}>

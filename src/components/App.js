@@ -32,8 +32,7 @@ function App() {
     const [popupImage, setPopupImage] = useState('')
     const [popupTitle, setPopupTitle] = useState('')
     const [infoTooltip, setInfoTooltip] = useState(false)
-
-
+    const [spinner, setSpinner] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -70,7 +69,6 @@ function App() {
                 setPopupTitle('Что-то пошло не так! Попробуйте ещё раз.')
             })
             .finally(handleInfoTooltip)
-
     }
 
     function onLogin(email, password) {
@@ -89,6 +87,7 @@ function App() {
     }
 
     useEffect(() => {
+        setSpinner(true)
         Promise.all([api.getUserInfo(), api.getInitialCards()])
             .then(([user, cards]) => {
                 setCurrentUser(user)
@@ -97,6 +96,7 @@ function App() {
             .catch((err) => {
                 console.log(`Ошибка загрузки данных: ${err}`)
             })
+            .finally(() => setSpinner(false))
     },[])
 
     function handleCardLike(card) {
@@ -253,6 +253,7 @@ function App() {
                               onAddPlace={handleAddPlaceClick}
                               onCardClick={handleCardClick}
                               cards={cards}
+                              spinner={spinner}
                               onCardLike={handleCardLike}
                               onDeleteCard={handleDeleteCard}
                           />

@@ -99,8 +99,10 @@ function App() {
                 setCurrentUser(user)
                 setCards(cards)
             })
-            .catch((err) => {
-                console.log(`Ошибка загрузки данных: ${err}`)
+            .catch(() => {
+                setPopupImage(fail)
+                setPopupTitle('Ошибка загрузки приложения')
+                handleInfoTooltip()
             })
             .finally(() => setSpinner(false))
     },[])
@@ -113,8 +115,10 @@ function App() {
                 .then((newCard) => {
                     setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
                 })
-                .catch((err) => {
-                    console.log(`Не получилось поставить лайк: ${err}`)
+                .catch(() => {
+                    setPopupImage(fail)
+                    setPopupTitle('Не получилось лайкнуть')
+                    handleInfoTooltip()
                 })
         } else {
             api.deleteCardLike(card._id)
@@ -122,7 +126,9 @@ function App() {
                     setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
                 })
                 .catch((err) => {
-                    console.log(`Не получилось дизлайкнуть: ${err}`)
+                    setPopupImage(fail)
+                    setPopupTitle('Не получилось дизлайкнуть')
+                    handleInfoTooltip()
                 })
         }
     }
@@ -133,8 +139,10 @@ function App() {
                 setCards((items) => items.filter((c) => c._id !== card._id && c))
                 closeAllPopups()
             })
-            .catch((err) => {
-                console.log(`Ошибка удаления карточки: ${err}`)
+            .catch(() => {
+                setPopupImage(fail)
+                setPopupTitle('Не получилось дизлайкнуть')
+                handleInfoTooltip()
             })
     }
 
@@ -144,8 +152,10 @@ function App() {
                 setCurrentUser(newUser)
                 closeAllPopups()
             })
-            .catch((err) => {
-                console.log(`Не удалось обновить профиль: ${err}`)
+            .catch(() => {
+                handleInfoTooltip()
+                setPopupImage(fail)
+                setPopupTitle('Не удалось обновить профиль попробуйте еще раз')
             })
     }
 
@@ -155,8 +165,10 @@ function App() {
               setCurrentUser(newAvatar)
               closeAllPopups()
             })
-            .catch((err) => {
-                console.log(`Не удалось обновить аватар: ${err}`)
+            .catch(() => {
+                setPopupImage(fail)
+                setPopupTitle('Не удалось обновить аватар')
+                handleInfoTooltip()
             })
     }
 
@@ -164,10 +176,11 @@ function App() {
         api.postNewCard(data)
             .then((newCard) => {
                 setCards([newCard, ...cards])
-                closeAllPopups()
             })
-            .catch((err) => {
-                console.log(`Не удалось добавить карточку: ${err}`)
+            .catch(() => {
+                handleInfoTooltip()
+                setPopupImage(fail)
+                setPopupTitle('Не удалось добавить карточку попробуйте еще раз')
             })
     }
 
@@ -271,7 +284,7 @@ function App() {
                                       cards={cards}
                                       onCardLike={handleCardLike}
                                   />
-                                  <Footer/>
+                                  <Footer />
                               </>
                           }
                       </>

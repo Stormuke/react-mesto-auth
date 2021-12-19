@@ -19,6 +19,8 @@ function AddPlacePopup(props) {
             name: title,
             link: link
         })
+
+        props.onClose()
     }
 
     React.useEffect(() => {

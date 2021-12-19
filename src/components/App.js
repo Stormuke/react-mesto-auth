@@ -17,6 +17,7 @@ import fail from "../images/fail.svg"
 import success from "../images/success.svg"
 import InfoTooltip from "./InfoTooltip";
 import DeleteCardPopup from "./DeleteCardPopup";
+import Spinner from "./Spinner";
 
 
 
@@ -34,12 +35,14 @@ function App() {
     const [popupImage, setPopupImage] = useState('')
     const [popupTitle, setPopupTitle] = useState('')
     const [infoTooltip, setInfoTooltip] = useState(false)
+    const [loader, setLoader] = useState(false)
     const [spinner, setSpinner] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
         const jwt = localStorage.getItem("jwt")
         if (jwt) {
+            setLoader(true)
             auth.checkToken(jwt)
                 .then((res) => {
                     if (res) {
@@ -50,6 +53,7 @@ function App() {
                 .catch((err) => {
                     console.log(`Не удалось получить токен: ${err}`)
                 })
+                .finally(() => {setLoader(false)})
         }
     }, [])
 
@@ -237,8 +241,8 @@ function App() {
               <Routes>
                   <Route path="/sign-in" element={
                       <>
-                          <Header title="Регистрация" route="/sign-up" />
-                          <Login onLogin={onLogin} />
+                          <Header title={loader ? "" : "Регистрация"} route="/sign-up" />
+                          {loader ? <Spinner /> : <Login onLogin={onLogin}/>}
                       </>
 
                   }
@@ -253,20 +257,23 @@ function App() {
                   />
                   <Route exact path="/" element={
                       <>
-                          <Header title="Выйти" mail={mailName} onClick={onSignOut} route=''/>
-                          <ProtectedRoute
-                              component={Main}
-                              isLogged={isLoggedIn}
-                              onEditAvatar={handleEditAvatarClick}
-                              onEditProfile={handleEditProfileClick}
-                              onAddPlace={handleAddPlaceClick}
-                              onCardClick={handleCardClick}
-                              onDeleteCard={handleDeleteCardClick}
-                              cards={cards}
-                              spinner={spinner}
-                              onCardLike={handleCardLike}
-                          />
-                          <Footer/>
+                          <Header title={spinner ? "" : "Выйти"} mail={spinner ? "" : mailName} onClick={onSignOut} route=''/>
+                          {spinner ? <Spinner/> :
+                              <>
+                                  <ProtectedRoute
+                                      component={Main}
+                                      isLogged={isLoggedIn}
+                                      onEditAvatar={handleEditAvatarClick}
+                                      onEditProfile={handleEditProfileClick}
+                                      onAddPlace={handleAddPlaceClick}
+                                      onCardClick={handleCardClick}
+                                      onDeleteCard={handleDeleteCardClick}
+                                      cards={cards}
+                                      onCardLike={handleCardLike}
+                                  />
+                                  <Footer/>
+                              </>
+                          }
                       </>
                   }
                   />

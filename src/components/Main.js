@@ -1,7 +1,6 @@
 import Card from "./Card";
 import React from "react";
 import { CurrentUserContext } from "../constexts/CurrentUserContext";
-import spin from "../images/spinner.gif"
 
 function Main(props) {
     const currentUser = React.useContext(CurrentUserContext)
@@ -10,7 +9,7 @@ function Main(props) {
             <section className="profile">
                 <div className="profile__container">
                     <button type="button" className="profile__edit-avatar" onClick={props.onEditAvatar}>
-                        <img src={props.spinner ? spin : currentUser.avatar} alt={currentUser.name}
+                        <img src={currentUser.avatar} alt={currentUser.name}
                             className="profile__avatar"
                         />
                     </button>

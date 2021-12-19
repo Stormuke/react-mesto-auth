@@ -5,7 +5,6 @@ function DeleteCardPopup(props) {
         evt.preventDefault()
 
         props.onSubmit(props.card)
-        props.onClose()
     }
 
     return(

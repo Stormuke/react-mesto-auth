@@ -16,6 +16,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import fail from "../images/fail.svg"
 import success from "../images/success.svg"
 import InfoTooltip from "./InfoTooltip";
+import DeleteCardPopup from "./DeleteCardPopup";
 
 
 
@@ -24,6 +25,7 @@ function App() {
     const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false)
     const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false)
     const [isImagePopupOpen, setIsImagePopupOpen] = useState(false)
+    const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false)
     const [selectedCard, setSelectedCard] = useState(null)
     const [currentUser, setCurrentUser] = useState({})
     const [cards, setCards] = useState([])
@@ -185,6 +187,11 @@ function App() {
         setInfoTooltip(true)
     }
 
+    function handleDeleteCardClick(card) {
+        setSelectedCard(card)
+        setIsDeletePopupOpen(true)
+    }
+
     function closeOverlayClick(evt) {
         if (evt.target.classList.contains('popup_opened')) {
             closeAllPopups()
@@ -213,6 +220,7 @@ function App() {
         setIsAddPlacePopupOpen(false)
         setIsImagePopupOpen(false)
         setInfoTooltip(false)
+        setIsDeletePopupOpen(false)
     }
 
     function onSignOut() {
@@ -252,10 +260,10 @@ function App() {
                               onEditProfile={handleEditProfileClick}
                               onAddPlace={handleAddPlaceClick}
                               onCardClick={handleCardClick}
+                              onDeleteCard={handleDeleteCardClick}
                               cards={cards}
                               spinner={spinner}
                               onCardLike={handleCardLike}
-                              onDeleteCard={handleDeleteCard}
                           />
                           <Footer/>
                       </>
@@ -294,6 +302,14 @@ function App() {
               onOverlayClick={closeOverlayClick}
               image={popupImage}
               title={popupTitle}
+          />
+
+          <DeleteCardPopup
+              isOpen={isDeletePopupOpen}
+              onClose={closeAllPopups}
+              onOverlayClick={closeOverlayClick}
+              onSubmit={handleDeleteCard}
+              card={selectedCard}
           />
       </div>
       </CurrentUserContext.Provider>
